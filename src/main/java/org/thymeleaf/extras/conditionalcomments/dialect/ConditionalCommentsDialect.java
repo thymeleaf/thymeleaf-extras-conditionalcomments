@@ -19,12 +19,13 @@
  */
 package org.thymeleaf.extras.conditionalcomments.dialect;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.extras.conditionalcomments.dialect.processor.ConditionalCommentProcessor;
 import org.thymeleaf.processor.IProcessor;
+import org.thymeleaf.processor.document.ProcessCommentNodesDocumentProcessor;
 
 
 
@@ -35,8 +36,6 @@ import org.thymeleaf.processor.IProcessor;
  */
 public class ConditionalCommentsDialect extends AbstractDialect {
 
-    public static final String DEFAULT_PREFIX = "condcom";
-    
     
     public ConditionalCommentsDialect() {
         super();
@@ -45,7 +44,9 @@ public class ConditionalCommentsDialect extends AbstractDialect {
     
     
     public String getPrefix() {
-        return DEFAULT_PREFIX;
+        // No attribute or tag processors, so we don't need a prefix at all and
+        // we can return whichever value.
+        return "condcom";
     }
 
     
@@ -58,7 +59,11 @@ public class ConditionalCommentsDialect extends AbstractDialect {
     
     @Override
     public Set<IProcessor> getProcessors() {
-        return Collections.singleton((IProcessor)new ConditionalCommentProcessor());
+        final Set<IProcessor> processors = new HashSet<IProcessor>();
+        processors.add(new ConditionalCommentProcessor());
+        // This processor is needed to enable the processing of Comment nodes
+        processors.add(new ProcessCommentNodesDocumentProcessor());
+        return processors;
     }
 
     

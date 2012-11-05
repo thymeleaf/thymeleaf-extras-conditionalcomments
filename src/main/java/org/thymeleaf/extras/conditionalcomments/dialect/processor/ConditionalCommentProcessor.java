@@ -19,12 +19,18 @@
  */
 package org.thymeleaf.extras.conditionalcomments.dialect.processor;
 
+import java.util.List;
+
 import org.thymeleaf.Arguments;
+import org.thymeleaf.dom.Comment;
+import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.processor.AbstractProcessor;
-import org.thymeleaf.processor.IProcessorMatcher;
-import org.thymeleaf.processor.ProcessorMatchingContext;
+import org.thymeleaf.extras.conditionalcomments.parser.AttoTemplateParser;
+import org.thymeleaf.extras.conditionalcomments.util.ConditionalCommentParsingResult;
+import org.thymeleaf.extras.conditionalcomments.util.ConditionalCommentUtils;
 import org.thymeleaf.processor.ProcessorResult;
+import org.thymeleaf.processor.comment.AbstractCommentNodeProcessor;
+import org.thymeleaf.util.DOMUtils;
 
 
 
@@ -35,7 +41,7 @@ import org.thymeleaf.processor.ProcessorResult;
  * @since 1.0
  *
  */
-public class ConditionalCommentProcessor extends AbstractProcessor {
+public class ConditionalCommentProcessor extends AbstractCommentNodeProcessor {
 
     
     public static final int PRECEDENCE = 1000;
@@ -43,14 +49,7 @@ public class ConditionalCommentProcessor extends AbstractProcessor {
     
     
     public ConditionalCommentProcessor() {
-        super();
-    }
-    
-
-
-    
-    public IProcessorMatcher<? extends Node> getMatcher() {
-        return ConditionalCommentNodeProcessorMatcher.INSTANCE;
+        super(ConditionalCommentNodeProcessorMatcher.INSTANCE);
     }
 
 
@@ -63,9 +62,78 @@ public class ConditionalCommentProcessor extends AbstractProcessor {
 
     
     @Override
-    protected ProcessorResult doProcess(final Arguments arguments,
-            final ProcessorMatchingContext processorMatchingContext, final Node node) {
+    protected ProcessorResult processCommentNode(final Arguments arguments, final Comment commentNode) {
 
+        final ConditionalCommentParsingResult parsingResult =
+            ConditionalCommentUtils.parseConditionalComment(commentNode.unsafeGetContentCharArray());
+
+        
+        final StringBuilder strBuilder = new StringBuilder();
+        
+        strBuilder.append("[");
+        strBuilder.append(parsingResult.getText(), parsingResult.getStartExpressionOffset(), parsingResult.getStartExpressionLen());
+        strBuilder.append("]>");
+        
+        List<Node> nodes = null;
+
+{
+        final AttoTemplateParser parser = new AttoTemplateParser();
+
+        final long start = System.nanoTime();
+        nodes =
+                parser.parseFragment(
+                arguments.getConfiguration(), 
+                parsingResult.getText(), parsingResult.getContentOffset(), parsingResult.getContentLen());
+        
+        final long end = System.nanoTime();
+        
+        System.out.println("\n\n*** PARSED in: " + (end - start) + "\n\n");
+}
+//{
+//        final ITemplateParser parser = new XhtmlAndHtml5NonValidatingSAXTemplateParser(1);
+//        
+//        final long start = System.nanoTime();
+//        nodes =
+//                parser.parseFragment(
+//                arguments.getConfiguration(), 
+//                new String(parsingResult.getText(), parsingResult.getContentOffset(), parsingResult.getContentLen()));
+//          
+//        final long end = System.nanoTime();
+//          
+//        System.out.println("\n\n*** PARSED in: " + (end - start) + "\n\n");
+//        
+//}
+    
+        for (final Node node : nodes) {
+            if (node instanceof Element) {
+                final Element el = (Element) node;
+                strBuilder.append("[[");
+                strBuilder.append(DOMUtils.getHtml5For(node));
+                strBuilder.append("]");
+                strBuilder.append(el.getRepresentationInTemplate());
+                strBuilder.append(",");
+                strBuilder.append(el.hasChildren());
+                strBuilder.append("]");
+                if (el.hasChildren()) {
+                    for (final Node child : el.getChildren()) {
+                        strBuilder.append("{{");
+                        strBuilder.append(DOMUtils.getHtml5For(child));
+                        strBuilder.append("}");
+                        strBuilder.append(child.getClass().getName());
+                        strBuilder.append("}");
+                    }
+                }
+            } else {
+                strBuilder.append(DOMUtils.getHtml5For(node));
+            }
+        }
+        
+        strBuilder.append("<![");
+        strBuilder.append(parsingResult.getText(), parsingResult.getEndExpressionOffset(), parsingResult.getEndExpressionLen());
+        strBuilder.append("]");
+        
+        commentNode.setContent(strBuilder.toString());
+        
         return ProcessorResult.OK;
         
     }

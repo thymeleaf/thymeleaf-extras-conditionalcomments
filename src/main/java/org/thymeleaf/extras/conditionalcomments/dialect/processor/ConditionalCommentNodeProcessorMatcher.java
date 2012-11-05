@@ -22,7 +22,7 @@ package org.thymeleaf.extras.conditionalcomments.dialect.processor;
 import org.thymeleaf.dom.Comment;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.extras.conditionalcomments.util.ConditionalCommentUtils;
-import org.thymeleaf.processor.IProcessorMatcher;
+import org.thymeleaf.processor.ICommentNodeProcessorMatcher;
 import org.thymeleaf.processor.ProcessorMatchingContext;
 
 
@@ -44,7 +44,7 @@ import org.thymeleaf.processor.ProcessorMatchingContext;
  * @since 1.0
  *
  */
-public final class ConditionalCommentNodeProcessorMatcher implements IProcessorMatcher<Comment> {
+public final class ConditionalCommentNodeProcessorMatcher implements ICommentNodeProcessorMatcher {
     
     
     public static ConditionalCommentNodeProcessorMatcher INSTANCE = new ConditionalCommentNodeProcessorMatcher();
