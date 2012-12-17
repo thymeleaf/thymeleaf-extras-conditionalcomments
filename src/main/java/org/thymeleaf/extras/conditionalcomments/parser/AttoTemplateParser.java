@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Stack;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
-import org.attoparser.markup.DocumentRestrictions;
 import org.attoparser.markup.MarkupAttoParser;
+import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
+import org.attoparser.markup.html.HtmlParsing;
+import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.elements.IHtmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.Configuration;
@@ -64,14 +66,13 @@ public class AttoTemplateParser implements ITemplateParser {
     
     private static final MarkupAttoParser parser = new MarkupAttoParser();
     
-    static final DocumentRestrictions DOCUMENT_RESTRICTIONS;
+    static final HtmlParsingConfiguration  HTML_PARSING_CONFIGURATION;
     
     
     
     static {
-        DOCUMENT_RESTRICTIONS = DocumentRestrictions.none();
-        DOCUMENT_RESTRICTIONS.setRequireNoUnbalancedCloseElements(true);
-        DOCUMENT_RESTRICTIONS.setRequireUniqueAttributesInElement(true);
+        HTML_PARSING_CONFIGURATION = HtmlParsing.htmlParsingConfiguration();
+        HTML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
     }
     
     
@@ -81,6 +82,7 @@ public class AttoTemplateParser implements ITemplateParser {
     }
     
 
+    
     
     public final Document parseTemplate(final Configuration configuration, final String documentName, final Reader reader) {
 
@@ -204,7 +206,7 @@ public class AttoTemplateParser implements ITemplateParser {
     
     
     
-    private static final class TemplateAttoHandler extends AbstractDetailedMarkupAttoHandler {
+    private static final class TemplateAttoHandler extends AbstractDetailedNonValidatingHtmlAttoHandler {
 
         private static final Logger logger = LoggerFactory.getLogger(TemplateAttoHandler.class);
         
@@ -229,7 +231,7 @@ public class AttoTemplateParser implements ITemplateParser {
         
         public TemplateAttoHandler(final String documentName) {
             
-            super(AttoTemplateParser.DOCUMENT_RESTRICTIONS);
+            super(AttoTemplateParser.HTML_PARSING_CONFIGURATION);
 
             this.documentName = documentName;
             
@@ -281,10 +283,10 @@ public class AttoTemplateParser implements ITemplateParser {
         public void handleDocumentEnd(
                 final long endTimeNanos, final long totalTimeNanos,
                 final int line, final int col, 
-                final DocumentRestrictions documentRestrictions)
+                final HtmlParsingConfiguration configuration)
                 throws AttoParseException {
 
-            super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, documentRestrictions);
+            super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, configuration);
             
             if (logger.isTraceEnabled()) {
                 final BigDecimal elapsed = BigDecimal.valueOf(totalTimeNanos);
@@ -511,7 +513,7 @@ public class AttoTemplateParser implements ITemplateParser {
 
         
         @Override
-        public void handleAttribute(
+        public void handleHtmlAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -522,7 +524,7 @@ public class AttoTemplateParser implements ITemplateParser {
                 final int valueLine, final int valueCol) 
                 throws AttoParseException {
 
-            super.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
+            super.handleHtmlAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                     operatorOffset, operatorLen, operatorLine, operatorCol,
                     valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
                     valueLine, valueCol);
@@ -543,13 +545,15 @@ public class AttoTemplateParser implements ITemplateParser {
         
         
         @Override
-        public void handleStandaloneElementName(
+        public void handleHtmlStandaloneElementStart(
+                final IHtmlElement htmlElement,
+                final boolean minimized,
                 final char[] buffer, 
                 final int offset, final int len, 
                 final int line, final int col) 
                 throws AttoParseException {
             
-            super.handleStandaloneElementName(buffer, offset, len, line, col);
+            super.handleHtmlStandaloneElementStart(htmlElement, minimized, buffer, offset, len, line, col);
             
             final String elementName = new String(buffer, offset, len);
             
@@ -570,13 +574,14 @@ public class AttoTemplateParser implements ITemplateParser {
 
 
         @Override
-        public void handleOpenElementName(
+        public void handleHtmlOpenElementStart(
+                final IHtmlElement htmlElement,
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
 
-            super.handleOpenElementName(buffer, offset, len, line, col);
+            super.handleHtmlOpenElementStart(htmlElement, buffer, offset, len, line, col);
             
             final String elementName = new String(buffer, offset, len);
             
@@ -592,13 +597,14 @@ public class AttoTemplateParser implements ITemplateParser {
 
 
         @Override
-        public void handleCloseElementName(
+        public void handleHtmlCloseElementStart(
+                final IHtmlElement htmlElement,
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col) 
                 throws AttoParseException {
 
-            super.handleCloseElementName(buffer, offset, len, line, col);
+            super.handleHtmlCloseElementStart(htmlElement, buffer, offset, len, line, col);
             
             final String closedElementName = new String(buffer, offset, len);
             searchInStack(closedElementName);
