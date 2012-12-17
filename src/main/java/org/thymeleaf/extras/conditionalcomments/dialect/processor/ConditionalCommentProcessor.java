@@ -19,18 +19,22 @@
  */
 package org.thymeleaf.extras.conditionalcomments.dialect.processor;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Comment;
-import org.thymeleaf.dom.Element;
+import org.thymeleaf.dom.Document;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.extras.conditionalcomments.parser.AttoTemplateParser;
+import org.thymeleaf.exceptions.TemplateProcessingException;
+import org.thymeleaf.extras.conditionalcomments.parser.ConditionalCommentAttoTemplateParser;
 import org.thymeleaf.extras.conditionalcomments.util.ConditionalCommentParsingResult;
 import org.thymeleaf.extras.conditionalcomments.util.ConditionalCommentUtils;
 import org.thymeleaf.processor.ProcessorResult;
 import org.thymeleaf.processor.comment.AbstractCommentNodeProcessor;
-import org.thymeleaf.util.DOMUtils;
+import org.thymeleaf.templatemode.ITemplateModeHandler;
+import org.thymeleaf.templatewriter.ITemplateWriter;
 
 
 
@@ -68,71 +72,57 @@ public class ConditionalCommentProcessor extends AbstractCommentNodeProcessor {
             ConditionalCommentUtils.parseConditionalComment(commentNode.unsafeGetContentCharArray());
 
         
-        final StringBuilder strBuilder = new StringBuilder();
+        final StringWriter writer = new StringWriter();
         
-        strBuilder.append("[");
-        strBuilder.append(parsingResult.getText(), parsingResult.getStartExpressionOffset(), parsingResult.getStartExpressionLen());
-        strBuilder.append("]>");
+        /*
+         * Rebuild the conditional comment start expression
+         */
+        writer.write("[");
+        writer.write(parsingResult.getText(), parsingResult.getStartExpressionOffset(), parsingResult.getStartExpressionLen());
+        writer.write("]>");
         
-        List<Node> nodes = null;
+        final ConditionalCommentAttoTemplateParser parser = new ConditionalCommentAttoTemplateParser();
 
-{
-        final AttoTemplateParser parser = new AttoTemplateParser();
-
-        final long start = System.nanoTime();
-        nodes =
+        final List<Node> nodes = 
                 parser.parseFragment(
-                arguments.getConfiguration(), 
-                parsingResult.getText(), parsingResult.getContentOffset(), parsingResult.getContentLen());
+                    arguments.getConfiguration(), 
+                    parsingResult.getText(), 
+                    parsingResult.getContentOffset(), 
+                    parsingResult.getContentLen());
         
-        final long end = System.nanoTime();
+        final String templateMode = 
+                arguments.getTemplateResolution().getTemplateMode();
+        final ITemplateModeHandler templateModeHandler =
+                arguments.getConfiguration().getTemplateModeHandler(templateMode);
+        final ITemplateWriter templateWriter = templateModeHandler.getTemplateWriter();
         
-        System.out.println("\n\n*** PARSED in: " + (end - start) + "\n\n");
-}
-//{
-//        final ITemplateParser parser = new XhtmlAndHtml5NonValidatingSAXTemplateParser(1);
-//        
-//        final long start = System.nanoTime();
-//        nodes =
-//                parser.parseFragment(
-//                arguments.getConfiguration(), 
-//                new String(parsingResult.getText(), parsingResult.getContentOffset(), parsingResult.getContentLen()));
-//          
-//        final long end = System.nanoTime();
-//          
-//        System.out.println("\n\n*** PARSED in: " + (end - start) + "\n\n");
-//        
-//}
-    
-        for (final Node node : nodes) {
-            if (node instanceof Element) {
-                final Element el = (Element) node;
-                strBuilder.append("[[");
-                strBuilder.append(DOMUtils.getHtml5For(node));
-                strBuilder.append("]");
-                strBuilder.append(el.getRepresentationInTemplate());
-                strBuilder.append(",");
-                strBuilder.append(el.hasChildren());
-                strBuilder.append("]");
-                if (el.hasChildren()) {
-                    for (final Node child : el.getChildren()) {
-                        strBuilder.append("{{");
-                        strBuilder.append(DOMUtils.getHtml5For(child));
-                        strBuilder.append("}");
-                        strBuilder.append(child.getClass().getName());
-                        strBuilder.append("}");
-                    }
-                }
-            } else {
-                strBuilder.append(DOMUtils.getHtml5For(node));
-            }
+        
+        final Document document = 
+                new Document("[Conditional Comment at line: " + commentNode.getLineNumber() + "]");
+        document.setChildren(nodes);
+        
+        document.process(arguments);
+        
+        try {
+            templateWriter.write(arguments, writer, document);
+        } catch (final IOException e) {
+            throw new TemplateProcessingException(
+                    "Error writing result of processing conditional comment at line " +
+                    commentNode.getLineNumber(), e);
         }
         
-        strBuilder.append("<![");
-        strBuilder.append(parsingResult.getText(), parsingResult.getEndExpressionOffset(), parsingResult.getEndExpressionLen());
-        strBuilder.append("]");
         
-        commentNode.setContent(strBuilder.toString());
+        /*
+         * Rebuild the conditional comment end expression
+         */
+        writer.write("<![");
+        writer.write(parsingResult.getText(), parsingResult.getEndExpressionOffset(), parsingResult.getEndExpressionLen());
+        writer.write("]");
+        
+        /*
+         * Re-set the comment content, once processed
+         */
+        commentNode.setContent(writer.toString());
         
         return ProcessorResult.OK;
         

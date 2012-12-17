@@ -61,7 +61,7 @@ import org.thymeleaf.util.DOMUtils;
  * @author Daniel Fern&aacute;ndez
  * 
  */
-public class AttoTemplateParser implements ITemplateParser {
+public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
     
     private static final MarkupAttoParser parser = new MarkupAttoParser();
@@ -77,7 +77,7 @@ public class AttoTemplateParser implements ITemplateParser {
     
     
     
-    public AttoTemplateParser() {
+    public ConditionalCommentAttoTemplateParser() {
         super();
     }
     
@@ -214,7 +214,7 @@ public class AttoTemplateParser implements ITemplateParser {
         private final Stack<NestableNode> elementStack;
         
         /*
-         * TODO Should be an AttributeHolder instead of an Element in > 2.1
+         * TODO Should be an AttributeHolder instead of an Element in >= 2.1
          */
         private Element currentElement = null;
 
@@ -231,7 +231,7 @@ public class AttoTemplateParser implements ITemplateParser {
         
         public TemplateAttoHandler(final String documentName) {
             
-            super(AttoTemplateParser.HTML_PARSING_CONFIGURATION);
+            super(ConditionalCommentAttoTemplateParser.HTML_PARSING_CONFIGURATION);
 
             this.documentName = documentName;
             
