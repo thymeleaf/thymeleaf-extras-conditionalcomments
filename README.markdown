@@ -24,8 +24,8 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.14+**
-  *   Attoparser [http://www.attoparser.org] **1.0**
+  *   Thymeleaf **2.0.15+**
+  *   Attoparser [http://www.attoparser.org] **1.1+**
 
 
 Maven info
