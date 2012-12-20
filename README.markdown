@@ -25,7 +25,7 @@ Requirements
 ------------
 
   *   Thymeleaf **2.0.15+**
-  *   Attoparser [http://www.attoparser.org] **1.1+**
+  *   Attoparser **1.1+** [http://www.attoparser.org]
 
 
 Maven info
@@ -33,6 +33,14 @@ Maven info
 
   *   groupId: `org.thymeleaf.extras`   
   *   artifactId: `thymeleaf-extras-conditionalcomments`
+
+
+Installation
+------------
+
+Just add the `org.thymeleaf.extras.conditionalcomments.dialect.ConditionalCommentsDialect`
+class to the list of dialects in your TemplateEngine implementation, and conditional comment
+processing will work out-of-the-box.
 
 
 Features
