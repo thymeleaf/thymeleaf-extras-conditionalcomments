@@ -37,6 +37,12 @@ Maven info
   *   artifactId: `thymeleaf-extras-conditionalcomments`
 
 
+Distribution packages
+---------------------
+
+Distribution packages (binaries + sources + javadoc) can be downloaded from [SourceForge](http://sourceforge.net/projects/thymeleaf/files/thymeleaf-extras-conditionalcomments/).
+
+
 Installation
 ------------
 
