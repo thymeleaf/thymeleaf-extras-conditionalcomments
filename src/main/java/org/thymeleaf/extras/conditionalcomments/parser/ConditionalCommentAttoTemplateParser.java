@@ -172,16 +172,16 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
     }
 
 
-    
-    public final List<Node> parseFragment(final Configuration configuration, final char[] buffer, final int offset, final int len) {
-        final Document document = 
+
+    public final List<Node> parseFragment(final Configuration configuration, final String text, final int offset, final int len) {
+        final Document document =
                 parseTemplate(
                         configuration,
-                        null, // documentName 
-                        new CharArrayReader(buffer, offset, len));
+                        null, // documentName
+                        new StringReader(text.substring(offset, offset + len)));
         return document.getChildren();
     }
-    
+
     
     
 
@@ -481,7 +481,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
         @Override
         public void handleComment(
-                final char[] buffer, 
+                final char[] buffer,
                 final int contentOffset, final int contentLen, 
                 final int outerOffset, final int outerLen, 
                 final int line, final int col)
@@ -489,9 +489,8 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
             super.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
-            final char[] content = new char[contentLen];
-            System.arraycopy(buffer, contentOffset, content, 0, contentLen);
-            
+            final String content = new String(buffer, contentOffset, contentLen);
+
             final Comment comment = new Comment(content);
             
             if (this.elementStack.isEmpty()) {
@@ -613,9 +612,9 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             final NestableNode node = this.elementStack.pop();
 
             if (node instanceof Element) {
-                
+
                 final Element element = (Element) node;
-                
+
                 // Adjust the representation in template. Differentiating between being
                 // empty or not will allow a more correct output behaviour if children are
                 // added or removed.

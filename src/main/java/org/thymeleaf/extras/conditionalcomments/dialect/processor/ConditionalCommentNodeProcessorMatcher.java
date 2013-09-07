@@ -31,12 +31,12 @@ import org.thymeleaf.processor.ProcessorMatchingContext;
 
 /**
  * <p>
- *   Implementation of {@link IProcessorMatcher} matching Comment nodes that
+ *   Implementation of {@link ICommentNodeProcessorMatcher} matching Comment nodes that
  *   look like conditional comments.
  * </p>
  * <p>
  *   In order to determine whether a comment is a conditional comment or not,
- *   {@link ConditionalCommentUtils#isConditionalComment(char[])} is used.
+ *   {@link ConditionalCommentUtils#isConditionalComment(String)} is used.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -64,7 +64,7 @@ public final class ConditionalCommentNodeProcessorMatcher implements ICommentNod
     /**
      * <p>
      *   Matches the specified {@link Node} if it is an instance of {@link Comment}
-     *   AND it conforms to {@link ConditionalCommentUtils#isConditionalComment(char[])}.
+     *   AND it conforms to {@link ConditionalCommentUtils#isConditionalComment(String)}.
      * </p>
      * 
      * @param node the node to be checked
@@ -79,7 +79,7 @@ public final class ConditionalCommentNodeProcessorMatcher implements ICommentNod
         }
         
         final Comment comment = (Comment) node;
-        return ConditionalCommentUtils.isConditionalComment(comment.unsafeGetContentCharArray());
+        return ConditionalCommentUtils.isConditionalComment(comment.getContent());
         
     }
 

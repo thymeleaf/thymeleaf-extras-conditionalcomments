@@ -69,7 +69,7 @@ public class ConditionalCommentProcessor extends AbstractCommentNodeProcessor {
     protected ProcessorResult processCommentNode(final Arguments arguments, final Comment commentNode) {
 
         final ConditionalCommentParsingResult parsingResult =
-            ConditionalCommentUtils.parseConditionalComment(commentNode.unsafeGetContentCharArray());
+            ConditionalCommentUtils.parseConditionalComment(commentNode.getContent());
 
         
         final StringWriter writer = new StringWriter();

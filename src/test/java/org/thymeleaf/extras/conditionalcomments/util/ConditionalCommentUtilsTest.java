@@ -125,10 +125,8 @@ public final class ConditionalCommentUtilsTest extends TestCase {
             final String expectedStartExpression, final String expectedContent, final String expectedEndExpression,
             final boolean shouldFail) {
         
-        final char[] buffer = text.toCharArray();
-        
-        final ConditionalCommentParsingResult result = 
-                ConditionalCommentUtils.parseConditionalComment(buffer);
+        final ConditionalCommentParsingResult result =
+                ConditionalCommentUtils.parseConditionalComment(text);
         if (result == null) {
             if (!shouldFail) {
                 assertTrue("Text \""+ text + "\" did not parse OK but should have", false);
@@ -138,9 +136,12 @@ public final class ConditionalCommentUtilsTest extends TestCase {
         }
 
         if (result != null) {
-            final String obtainedStartExpression = new String(result.getText(), result.getStartExpressionOffset(), result.getStartExpressionLen()); 
-            final String obtainedContent = new String(result.getText(), result.getContentOffset(), result.getContentLen()); 
-            final String obtainedEndExpression = new String(result.getText(), result.getEndExpressionOffset(), result.getEndExpressionLen()); 
+            final String obtainedStartExpression =
+                    result.getText().substring(result.getStartExpressionOffset(), result.getStartExpressionOffset() + result.getStartExpressionLen());
+            final String obtainedContent =
+                    result.getText().substring(result.getContentOffset(), result.getContentOffset() + result.getContentLen());
+            final String obtainedEndExpression =
+                    result.getText().substring(result.getEndExpressionOffset(), result.getEndExpressionOffset() + result.getEndExpressionLen());
             
             assertEquals(expectedStartExpression, obtainedStartExpression);
             assertEquals(expectedContent, obtainedContent);

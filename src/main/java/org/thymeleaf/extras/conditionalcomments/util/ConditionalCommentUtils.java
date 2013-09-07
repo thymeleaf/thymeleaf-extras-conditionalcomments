@@ -49,14 +49,14 @@ public final class ConditionalCommentUtils {
      *   or not.
      * </p>
      * <p>
-     *   This method makes use of {@link #parseConditionalComment(char[])}.
+     *   This method makes use of {@link #parseConditionalComment(String)}.
      * </p>
      * 
-     * @param buffer the text to be checked.
+     * @param text the text to be checked.
      * @return true if the text has the format of a conditional comment, false if not.
      */
-    public static boolean isConditionalComment(final char[] buffer) {
-        return parseConditionalComment(buffer) != null;
+    public static boolean isConditionalComment(final String text) {
+        return parseConditionalComment(text) != null;
     }
         
     
@@ -70,28 +70,28 @@ public final class ConditionalCommentUtils {
      *  <tt>null</tt> if text does not have the expected format for a conditional comment.
      * </p>
      * 
-     * @param buffer the text to be parsed
+     * @param text the text to be parsed
      * @return a {@link ConditionalCommentParsingResult} object if text could be parsed,
      *         null if format is invalid.
      */
-    public static ConditionalCommentParsingResult parseConditionalComment(final char[] text) {
+    public static ConditionalCommentParsingResult parseConditionalComment(final String text) {
         
-        final int len = text.length;
+        final int len = text.length();
         int i = 0;
         
 
         // discard all initial whitespace
-        while (i < len && Character.isWhitespace(text[i])) { i++; }
+        while (i < len && Character.isWhitespace(text.charAt(i))) { i++; }
         
         // check the first char after whitespace is '['
-        if (i >= len || text[i++] != '[') {
+        if (i >= len || text.charAt(i++) != '[') {
             return null;
         }
         
         final int startExpressionOffset = i;
         
         // look for last position of start expression
-        while (i < len && text[i] != ']') { i++; }
+        while (i < len && text.charAt(i) != ']') { i++; }
         
         if (i >= len) {
             return null;
@@ -103,10 +103,10 @@ public final class ConditionalCommentUtils {
         i++;
         
         // discard all following whitespace
-        while (i < len && Character.isWhitespace(text[i])) { i++; }
+        while (i < len && Character.isWhitespace(text.charAt(i))) { i++; }
         
         // check the first non-whitespace char after ']' is '>'
-        if (i >= len || text[i++] != '>') {
+        if (i >= len || text.charAt(i++) != '>') {
             return null;
         }
         
@@ -117,17 +117,17 @@ public final class ConditionalCommentUtils {
         i = len - 1;
         
         // discard all final whitespace
-        while (i > contentOffset && Character.isWhitespace(text[i])) { i--; }
+        while (i > contentOffset && Character.isWhitespace(text.charAt(i))) { i--; }
         
         // check the first char after whitespace is ']'
-        if (i <= contentOffset || text[i--] != ']') {
+        if (i <= contentOffset || text.charAt(i--) != ']') {
             return null;
         }
         
         final int endExpressionLastPos = i + 1;
         
         // look for first char of end expression
-        while (i > contentOffset && text[i] != '[') { i--; }
+        while (i > contentOffset && text.charAt(i) != '[') { i--; }
         
         if (i <= contentOffset) {
             return null;
@@ -140,15 +140,15 @@ public final class ConditionalCommentUtils {
         i--;
         
         // discard all following whitespace
-        while (i >= contentOffset && Character.isWhitespace(text[i])) { i--; }
+        while (i >= contentOffset && Character.isWhitespace(text.charAt(i))) { i--; }
         
         // check the first non-whitespace char before '[' is '!'
-        if (i <= contentOffset || text[i--] != '!') {
+        if (i <= contentOffset || text.charAt(i--) != '!') {
             return null;
         }
         
         // check the first char before '!' is '<'
-        if (i <= contentOffset || text[i--] != '<') {
+        if (i <= contentOffset || text.charAt(i--) != '<') {
             return null;
         }
         

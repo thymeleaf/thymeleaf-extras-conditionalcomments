@@ -50,7 +50,7 @@ package org.thymeleaf.extras.conditionalcomments.util;
 public final class ConditionalCommentParsingResult {
 
     
-    private final char[] text;
+    private final String text;
     private final int startExpressionOffset;
     private final int startExpressionLen;
     private final int contentOffset;
@@ -61,7 +61,7 @@ public final class ConditionalCommentParsingResult {
     
     
     
-    public ConditionalCommentParsingResult(final char[] text,
+    public ConditionalCommentParsingResult(final String text,
             final int startExpressionOffset, final int startExpressionLen,
             final int contentOffset, final int contentLen, final int endExpressionOffset,
             final int endExpressionLen) {
@@ -81,7 +81,7 @@ public final class ConditionalCommentParsingResult {
 
 
 
-    public char[] getText() {
+    public String getText() {
         return this.text;
     }
 
