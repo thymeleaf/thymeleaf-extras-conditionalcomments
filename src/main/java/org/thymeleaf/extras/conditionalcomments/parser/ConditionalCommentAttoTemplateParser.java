@@ -418,9 +418,8 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
             super.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
-            final char[] content = new char[contentLen];
-            System.arraycopy(buffer, contentOffset, content, 0, contentLen);
-            
+            final String content = new String(buffer, contentOffset, contentLen);
+
             TemplatePreprocessingReader.removeEntitySubstitutions(buffer, 0, contentLen);
             
             final Node cdata = new CDATASection(content, false);
@@ -453,10 +452,9 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
             super.handleText(buffer, offset, len, line, col);
 
-            final char[] content = new char[len];
-            System.arraycopy(buffer, offset, content, 0, len);
+            TemplatePreprocessingReader.removeEntitySubstitutions(buffer, offset, len);
 
-            TemplatePreprocessingReader.removeEntitySubstitutions(content, 0, len);
+            final String content = new String(buffer, offset, len);
 
             final Node textNode = new Text(content, false);
             
