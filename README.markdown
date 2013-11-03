@@ -13,8 +13,8 @@ Thymeleaf team.
 
 Current versions: 
 
-  * **Version 2.0.0** - for Thymeleaf 2.0 (requires 2.0.15+) 
-  * **Version 2.1.0-beta2** - for Thymeleaf 2.1 (requires 2.1.0-beta2)
+  * **Version 2.1.0.RELEASE** - for Thymeleaf 2.1 (requires 2.1.0+)
+  * **Version 2.0.0** - for Thymeleaf 2.0 (requires 2.0.15+)
 
 
 License
@@ -27,7 +27,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.15+** (or **2.1.0-beta2**)
+  *   Thymeleaf **2.1.0+**
   *   Attoparser **1.1+** [http://www.attoparser.org]
 
 
