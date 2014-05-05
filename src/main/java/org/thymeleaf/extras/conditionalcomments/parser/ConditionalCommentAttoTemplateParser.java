@@ -19,7 +19,6 @@
  */
 package org.thymeleaf.extras.conditionalcomments.parser;
 
-import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -51,7 +50,6 @@ import org.thymeleaf.exceptions.TemplateInputException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.templateparser.ITemplateParser;
 import org.thymeleaf.templateparser.TemplatePreprocessingReader;
-import org.thymeleaf.util.DOMUtils;
 
 /**
  * <p>
@@ -422,7 +420,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
             TemplatePreprocessingReader.removeEntitySubstitutions(buffer, 0, contentLen);
             
-            final Node cdata = new CDATASection(content, false);
+            final Node cdata = new CDATASection(content, null, null, true);
 
             if (this.elementStack.isEmpty()) {
                 this.rootNodes.add(cdata);
@@ -456,7 +454,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
             final String content = new String(buffer, offset, len);
 
-            final Node textNode = new Text(content, false);
+            final Node textNode = new Text(content, null, null, true);
             
             if (this.elementStack.isEmpty()) {
                 this.rootNodes.add(textNode);
@@ -533,8 +531,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             final String attributeValue = new String(buffer, valueContentOffset, valueContentLen);
             
             this.currentElement.setAttribute(
-                    attributeName,
-                    DOMUtils.unescapeXml(attributeValue, true));
+                    attributeName, false, attributeValue, true);
             
         }
 
