@@ -24,7 +24,7 @@
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-conditionalcomments</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <name>thymeleaf-extras-conditionalcomments</name>
   <url>http://www.thymeleaf.org</url>
 
@@ -104,8 +104,8 @@
 
   <properties>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-    <thymeleaf.version>2.1.3.RELEASE</thymeleaf.version>
-    <attoparser.version>1.4.0.RELEASE</attoparser.version>
+    <thymeleaf.version>3.0.0-SNAPSHOT</thymeleaf.version>
+    <attoparser.version>2.0.0-SNAPSHOT</attoparser.version>
   </properties>
 
 
