@@ -29,9 +29,9 @@ import java.util.Stack;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.MarkupAttoParser;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsing;
-import org.attoparser.markup.html.HtmlParsingConfiguration;
 import org.attoparser.markup.html.elements.IHtmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,12 +64,12 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
     
     private static final MarkupAttoParser parser = new MarkupAttoParser();
     
-    static final HtmlParsingConfiguration  HTML_PARSING_CONFIGURATION;
+    static final MarkupParsingConfiguration HTML_PARSING_CONFIGURATION;
     
     
     
     static {
-        HTML_PARSING_CONFIGURATION = HtmlParsing.htmlParsingConfiguration();
+        HTML_PARSING_CONFIGURATION = HtmlParsing.baseHtmlMarkupParsingConfiguration();
         HTML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
     }
     
@@ -281,7 +281,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
         public void handleDocumentEnd(
                 final long endTimeNanos, final long totalTimeNanos,
                 final int line, final int col, 
-                final HtmlParsingConfiguration configuration)
+                final MarkupParsingConfiguration configuration)
                 throws AttoParseException {
 
             super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, configuration);
