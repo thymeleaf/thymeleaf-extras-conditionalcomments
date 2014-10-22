@@ -27,13 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
-import org.attoparser.markup.MarkupAttoParser;
-import org.attoparser.markup.MarkupParsingConfiguration;
-import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
-import org.attoparser.markup.html.HtmlParsing;
-import org.attoparser.markup.html.elements.IHtmlElement;
+import org.attoparser.AbstractMarkupHandler;
+import org.attoparser.IMarkupParser;
+import org.attoparser.MarkupParser;
+import org.attoparser.ParseException;
+import org.attoparser.config.ParseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.Configuration;
@@ -63,15 +61,16 @@ import org.thymeleaf.templateparser.TemplatePreprocessingReader;
 public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
     
-    private static final MarkupAttoParser parser = new MarkupAttoParser();
-    
-    static final MarkupParsingConfiguration HTML_PARSING_CONFIGURATION;
-    
+
+    static final ParseConfiguration HTML_PARSING_CONFIGURATION;
+    private static final IMarkupParser parser;
+
     
     
     static {
-        HTML_PARSING_CONFIGURATION = HtmlParsing.baseHtmlMarkupParsingConfiguration();
-        HTML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
+        HTML_PARSING_CONFIGURATION = ParseConfiguration.htmlConfiguration();
+        HTML_PARSING_CONFIGURATION.setUniqueAttributesInElementRequired(true);
+        parser = new MarkupParser(HTML_PARSING_CONFIGURATION);
     }
     
     
@@ -93,7 +92,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             
         } catch (final TemplateProcessingException e) {
             throw e;
-        } catch (final AttoParseException e) {
+        } catch (final ParseException e) {
             String message = null;
             if (documentName == null) {
                 message = 
@@ -113,9 +112,9 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
     
     
     private static Document doParse(final String documentName, final TemplatePreprocessingReader reader)
-            throws AttoParseException {
+            throws ParseException {
 
-        final TemplateAttoHandler handler = new TemplateAttoHandler(documentName);
+        final TemplateMarkupHandler handler = new TemplateMarkupHandler(documentName);
         
         parser.parse(reader, handler);
         
@@ -205,9 +204,9 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
     
     
     
-    private static final class TemplateAttoHandler extends AbstractDetailedNonValidatingHtmlAttoHandler {
+    private static final class TemplateMarkupHandler extends AbstractMarkupHandler {
 
-        private static final Logger logger = LoggerFactory.getLogger(TemplateAttoHandler.class);
+        private static final Logger logger = LoggerFactory.getLogger(ConditionalCommentAttoTemplateParser.class);
         
         private final String documentName;
         private final Stack<NestableNode> elementStack;
@@ -228,9 +227,9 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
         private boolean xmlStandalone = false;
         
         
-        public TemplateAttoHandler(final String documentName) {
+        public TemplateMarkupHandler(final String documentName) {
             
-            super(ConditionalCommentAttoTemplateParser.HTML_PARSING_CONFIGURATION);
+            super();
 
             this.documentName = documentName;
             
@@ -279,11 +278,10 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
 
         @Override
-        public IAttoHandleResult handleDocumentEnd(
+        public void handleDocumentEnd(
                 final long endTimeNanos, final long totalTimeNanos,
-                final int line, final int col, 
-                final MarkupParsingConfiguration configuration)
-                throws AttoParseException {
+                final int line, final int col)
+                throws ParseException {
 
             if (logger.isTraceEnabled()) {
                 final BigDecimal elapsed = BigDecimal.valueOf(totalTimeNanos);
@@ -301,8 +299,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 }
             }
 
-            return null;
-            
         }
 
         
@@ -316,7 +312,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
         
         
         @Override
-        public IAttoHandleResult handleXmlDeclarationDetail(
+        public void handleXmlDeclaration(
                 final char[] buffer,
                 final int keywordOffset, final int keywordLen, 
                 final int keywordLine, final int keywordCol, 
@@ -328,7 +324,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 final int standaloneLine, final int standaloneCol, 
                 final int outerOffset, final int outerLen, 
                 final int line, final int col) 
-                throws AttoParseException {
+                throws ParseException {
 
             if (versionLen > 0) {
                 this.xmlVersion = new String(buffer, versionOffset, versionLen);
@@ -339,8 +335,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             if (standaloneLen > 0) {
                 this.xmlStandalone = Boolean.parseBoolean(new String(buffer, standaloneOffset, standaloneLen));
             }
-
-            return null;
 
         }
 
@@ -355,7 +349,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
         
 
         @Override
-        public IAttoHandleResult handleDocType(
+        public void handleDocType(
                 final char[] buffer, 
                 final int keywordOffset, final int keywordLen, 
                 final int keywordLine, final int keywordCol,
@@ -371,7 +365,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 final int internalSubsetLine, final int internalSubsetCol, 
                 final int outerOffset, final int outerLen, 
                 final int outerLine, final int outerCol)
-                throws AttoParseException {
+                throws ParseException {
 
             if (elementNameLen > 0) {
                 this.docTypeRootElementName = new String(buffer, elementNameOffset, elementNameLen);
@@ -382,8 +376,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             if (systemIdLen > 0) {
                 this.docTypeSystemId = new String(buffer, systemIdOffset, systemIdLen);
             }
-
-            return null;
 
         }
 
@@ -398,12 +390,12 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
 
         @Override
-        public IAttoHandleResult handleCDATASection(
+        public void handleCDATASection(
                 final char[] buffer, 
                 final int contentOffset, final int contentLen, 
                 final int outerOffset, final int outerLen, 
                 final int line, final int col)
-                throws AttoParseException {
+                throws ParseException {
 
             final String content = new String(buffer, contentOffset, contentLen);
 
@@ -418,8 +410,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 parent.addChild(cdata);
             }
 
-            return null;
-
         }
         
         
@@ -433,11 +423,11 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
         
         @Override
-        public IAttoHandleResult handleText(
+        public void handleText(
                 final char[] buffer, 
                 final int offset, final int len, 
                 final int line, final int col) 
-                throws AttoParseException {
+                throws ParseException {
 
             TemplatePreprocessingReader.removeEntitySubstitutions(buffer, offset, len);
 
@@ -452,8 +442,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 parent.addChild(textNode);
             }
 
-            return null;
-
         }
         
 
@@ -467,12 +455,12 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
         
 
         @Override
-        public IAttoHandleResult handleComment(
+        public void handleComment(
                 final char[] buffer,
                 final int contentOffset, final int contentLen, 
                 final int outerOffset, final int outerLen, 
                 final int line, final int col)
-                throws AttoParseException {
+                throws ParseException {
 
             final String content = new String(buffer, contentOffset, contentLen);
 
@@ -484,8 +472,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 final NestableNode parent = this.elementStack.peek();
                 parent.addChild(comment);
             }
-
-            return null;
 
         }
         
@@ -499,7 +485,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
 
         
         @Override
-        public IAttoHandleResult handleHtmlAttribute(
+        public void handleAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -508,7 +494,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 final int valueContentOffset, final int valueContentLen, 
                 final int valueOuterOffset, final int valueOuterLen,
                 final int valueLine, final int valueCol) 
-                throws AttoParseException {
+                throws ParseException {
 
             final String attributeName = new String(buffer, nameOffset, nameLen);
             
@@ -519,21 +505,18 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             this.currentElement.setAttribute(
                     attributeName, false, attributeValue, true);
 
-            return null;
-
         }
 
 
         
         
         @Override
-        public IAttoHandleResult handleHtmlStandaloneElementStart(
-                final IHtmlElement htmlElement,
+        public void handleStandaloneElementStart(
+                final char[] buffer,
+                final int offset, final int len,
                 final boolean minimized,
-                final char[] buffer, 
-                final int offset, final int len, 
-                final int line, final int col) 
-                throws AttoParseException {
+                final int line, final int col)
+                throws ParseException {
 
             final String elementName = new String(buffer, offset, len);
             
@@ -548,20 +531,17 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 parent.addChild(element);
             }
 
-            return null;
-
         }
 
 
 
 
         @Override
-        public IAttoHandleResult handleHtmlOpenElementStart(
-                final IHtmlElement htmlElement,
-                final char[] buffer, 
+        public void handleOpenElementStart(
+                final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col)
-                throws AttoParseException {
+                throws ParseException {
 
             final String elementName = new String(buffer, offset, len);
             
@@ -571,20 +551,17 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
             
             this.elementStack.push(element);
 
-            return null;
-
         }
 
         
 
 
         @Override
-        public IAttoHandleResult handleHtmlCloseElementStart(
-                final IHtmlElement htmlElement,
-                final char[] buffer, 
+        public void handleCloseElementStart(
+                final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col) 
-                throws AttoParseException {
+                throws ParseException {
 
             final String closedElementName = new String(buffer, offset, len);
             searchInStack(closedElementName);
@@ -619,7 +596,7 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                         }
                     }
                     // End the handler
-                    return null;
+                    return;
                 }
                 
             }
@@ -631,8 +608,6 @@ public class ConditionalCommentAttoTemplateParser implements ITemplateParser {
                 parent.addChild(node);
             }
 
-            return null;
-            
         }
         
         
