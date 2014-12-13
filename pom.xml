@@ -19,7 +19,7 @@
 <!-- ========================================================================= -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-conditionalcomments</artifactId>
@@ -42,7 +42,7 @@
     <name>The THYMELEAF team</name>
     <url>http://www.thymeleaf.org</url>
   </organization>
-  
+
   <scm>
     <url>scm:git:git@github.com:thymeleaf/thymeleaf-extras-conditionalcomments.git</url>
     <connection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-conditionalcomments.git</connection>
@@ -76,7 +76,7 @@
       </roles>
     </developer>
   </developers>
-  
+
   <distributionManagement>
     <snapshotRepository>
       <id>sonatype-nexus-snapshots</id>
@@ -115,32 +115,32 @@
 
 
   <build>
-  
+
     <resources>
-    
+
       <resource>
         <directory>src/main/resources</directory>
       </resource>
-    
+
       <resource>
-          <directory>.</directory>
-          <targetPath>META-INF</targetPath>
-          <includes>
-              <include>LICENSE.txt</include>
-              <include>NOTICE.txt</include>
-          </includes>
+        <directory>.</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE.txt</include>
+          <include>NOTICE.txt</include>
+        </includes>
       </resource>
-      
+
     </resources>
-    
+
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
       </testResource>
     </testResources>
-    
+
     <plugins>
-    
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -150,7 +150,7 @@
           <target>1.5</target>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -201,7 +201,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -215,7 +215,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -237,7 +237,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -252,23 +252,23 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-		<version>2.1</version>
+        <version>2.1</version>
       </plugin>
 
 
     </plugins>
-    
+
   </build>
 
 
 
 
   <dependencies>
-    
+
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf</artifactId>
@@ -282,21 +282,21 @@
       <version>${attoparser.version}</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-        
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -324,9 +324,9 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
-    
+
+
   </dependencies>
 
-  
+
 </project>
