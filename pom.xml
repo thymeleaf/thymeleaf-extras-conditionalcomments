@@ -24,7 +24,7 @@
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-conditionalcomments</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2.RELEASE</version>
   <name>thymeleaf-extras-conditionalcomments</name>
   <url>http://www.thymeleaf.org</url>
 
@@ -47,6 +47,7 @@
     <url>scm:git:git@github.com:thymeleaf/thymeleaf-extras-conditionalcomments.git</url>
     <connection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-conditionalcomments.git</connection>
     <developerConnection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-conditionalcomments.git</developerConnection>
+    <tag>thymeleaf-extras-conditionalcomments-2.1.2.RELEASE</tag>
   </scm>
 
   <developers>
