@@ -13,7 +13,7 @@ Thymeleaf team.
 
 Current versions: 
 
-  * **Version 2.1.1.RELEASE** - for Thymeleaf 2.1 (requires 2.1.3+)
+  * **Version 2.1.2.RELEASE** - for Thymeleaf 2.1 (requires 2.1.3+)
   * **Version 2.0.0** - for Thymeleaf 2.0 (requires 2.0.15+)
 
 
@@ -28,7 +28,7 @@ Requirements
 ------------
 
   *   Thymeleaf **2.1.3+**
-  *   Attoparser **1.1+** [http://www.attoparser.org]
+  *   Attoparser **2.0.0+** [http://www.attoparser.org]
 
 
 Maven info
